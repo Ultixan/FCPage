@@ -10,6 +10,10 @@ const activeMembers = {
 
 let fcData = {};
 
+function normalize(value) {
+  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
 function loadData() {
   let promises = Object.keys(activeMembers).map(name => {
     let id = activeMembers[name];
@@ -18,8 +22,8 @@ function loadData() {
   });
   Promise.all(promises).then(responses => {
     let data = responses.map(rsp => {
-      let minions = rsp.Minions.map(minion=>minion.Name);
-      let mounts = rsp.Mounts.map(mount=>mount.Name);
+      let minions = rsp.Minions.map(minion => normalize(minion.Name));
+      let mounts = rsp.Mounts.map(mount => normalize(mount.Name));
       return [rsp.Character.Name, {'minions': minions, 'mounts': mounts}];
     });
     return Object.fromEntries(data);
@@ -33,7 +37,7 @@ function loadData() {
 }
 
 function checkData(dataKey) {
-  let item = document.querySelector('#item').value;
+  let item = normalize(document.querySelector('#item').value);
   let data = Object.keys(fcData).map(name => {
     let value = fcData[name][dataKey].includes(item) ? "✔" : "❌"
     return [name, value];
